@@ -40,8 +40,9 @@ pipeline {
         }
         stage('SCA - Dependency Checker') {
                     steps {
-                      container('maven') {
+                      container('maven') {catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE'){
                                           sh './mvnw org.owasp:dependency-check-maven:check'
+                      }
                         }
                     }
                     post {
