@@ -20,16 +20,6 @@ pipeline {
             }
           }
         }
-        stage('Secrets scanner') {
-                  steps {
-                    container('trufflehog') {
-                      sh 'git clone ${GIT_URL}'
-                      sh 'cd sample-api-service && ls -al'
-                      sh 'cd sample-api-service && trufflehog  --exclude_paths ./secrets-exclude.txt .'
-                      sh 'rm -rf sample-api-service'
-                    }
-                  }
-                }
       }
     }
     stage('Build') {
@@ -48,6 +38,19 @@ pipeline {
             }
           }
         }
+        stage('SCA - Dependency Checker') {
+                    steps {
+                      container('maven') {
+                                          sh './mvnw org.owasp:dependency-check-maven:check'
+                        }
+                    }
+                    post {
+                      always {
+                        archiveArtifacts allowEmptyArchive: true, artifacts: 'target/dependency-check-report.html', fingerprint: true, onlyIfSuccessful: false
+                        dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
+                      }
+                    }
+                  }
       }
     }
     stage('Package') {
