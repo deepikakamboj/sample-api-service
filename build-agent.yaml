@@ -26,10 +26,18 @@ spec:
       command:
         - cat
       tty: true
+    - name: licensefinder
+      image: licensefinder/license_finder
+      command:
+        - cat
+      tty: true
+      volumeMounts:
+        - name: maven
+          mountPath: /root/.m2/
     - name: docker-tools
       image: rmkanda/docker-tools:latest
       env:
-        - name: GRYPE_DB_CACHE_DIR 
+        - name: GRYPE_DB_CACHE_DIR
           value: /tmp/grypecache/
       command:
         - cat
